@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 public class Event {
     // Getters and Setters
-    private Long id;
+    private final Long id;
     @Setter
     private String title;
     @Setter
