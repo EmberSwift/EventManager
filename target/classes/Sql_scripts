@@ -1,0 +1,69 @@
+CREATE DATABASE events_db;
+
+
+-- 1. Удаление таблиц, если они уже существовали (для чистой установки)
+DROP TABLE IF EXISTS event_participations CASCADE;
+DROP TABLE IF EXISTS events CASCADE;
+DROP TABLE IF EXISTS students CASCADE;
+
+-- 2. Создание таблицы мероприятий
+CREATE TABLE events (
+    id BIGSERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    date_time TIMESTAMP NOT NULL
+);
+
+-- 3. Создание таблицы студентов
+CREATE TABLE students (
+    id BIGSERIAL PRIMARY KEY,
+    full_name VARCHAR(255) NOT NULL,
+    group_name VARCHAR(50) NOT NULL
+);
+
+-- 4. Создание таблицы участий (связывающая таблица)
+CREATE TABLE event_participations (
+    id BIGSERIAL PRIMARY KEY,
+    event_id BIGINT NOT NULL,
+    student_id BIGINT NOT NULL,
+    registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_participation_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    CONSTRAINT fk_participation_student FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+    CONSTRAINT uq_event_student UNIQUE (event_id, student_id)
+);
+
+-- 5. Вставка тестовых данных: Мероприятия
+INSERT INTO events (title, date_time) VALUES
+('Хакатон по разработке ПО', '2026-10-15 10:00:00'),
+('Олимпиада по спортивному программированию', '2026-11-01 12:00:00'),
+('Лекция по Spring Boot', '2026-11-20 15:30:00');
+
+-- 6. Вставка тестовых данных: Студенты
+INSERT INTO students (full_name, group_name) VALUES
+('Иванов Иван Сергеевич', 'БСО-01'),
+('Петрова Анна Алексеевна', 'БСО-01'),
+('Сидоров Алексей Дмитриевич', 'БПИ-02'),
+('Смирнова Мария Игоревна', 'БПИ-02');
+
+-- 7. Вставка тестовых данных: Участие студентов в мероприятиях
+INSERT INTO event_participations (event_id, student_id, registered_at) VALUES
+(1, 1, '2026-10-01 09:15:00'), -- Иванов на Хакатон
+(1, 2, '2026-10-01 09:30:00'), -- Петрова на Хакатон
+(1, 3, '2026-10-02 11:00:00'), -- Сидоров на Хакатон
+(2, 2, '2026-10-05 14:20:00'), -- Петрова на Олимпиаду
+(3, 1, '2026-10-10 16:45:00'), -- Иванов на Лекцию
+(3, 4, '2026-10-11 10:00:00'); -- Смирнова на Лекцию
+
+
+-- Проверка
+SELECT
+    e.title AS "Мероприятие",
+    e.date_time AS "Дата проведения",
+    s.full_name AS "ФИО Студента",
+    s.group_name AS "Группа",
+    ep.registered_at AS "Дата записи"
+FROM event_participations ep
+JOIN events e ON ep.event_id = e.id
+JOIN students s ON ep.student_id = s.id
+ORDER BY e.date_time, s.full_name;
+
+
