@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>EventAccounting</artifactId>
+    <artifactId>EventManager</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>EventAccounting</name>
     <description>Spring Boot project</description>
